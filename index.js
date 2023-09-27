@@ -5,8 +5,7 @@ const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.LINE_ACCESS_TOKEN;
 
 // Test関数
-const ROUTE_NAME = "つくばTX";//仮の路線
-const DEPARTURE_TIME_PLACEHOLDER = "06:40"; // 仮の時刻
+const ROUTE_NAME = "つくばTX";
 
 // ミドルウェアの設定
 app.use(express.json());
@@ -18,7 +17,7 @@ app.get("/", (req, res) => {
 });
 
 // Webhookエンドポイント
-app.post("/webhook", function (req, res) {
+app.post("/webhook", function(req, res) {
   // 応答を早めに返す
   res.send("HTTP POST request sent to the webhook URL!");
 
@@ -30,55 +29,50 @@ app.post("/webhook", function (req, res) {
       const matches = userInput.match(timePattern);
       const hours = parseInt(matches[1], 10);
       const minutes = parseInt(matches[2], 10);
-      const departureTime = `${hours}:${minutes}`;//ここで時間と分を分離したものを一つの変数に再導入：仮のものです。：
+      const sqlite3 = require('sqlite3').verbose();
+      const dbfile = "tx_kitasenju.db";
+      const db = new sqlite3.Database(dbfile); // dbの宣言
+      const query = "select MIN(depart_hour) as min_hour, depart_minute as min_minute from TX_kitasenju where depart_hour*100+depart_minute > ?*100+?"; // QUERY
 
-      //ここでSQLliteと繋げる 齊藤　飯塚頼んだ。
-      //からの配列を作る
-      const rows = [];
-      rows[0] = 13;  // 1番目の数値を8に変更する
-      rows[1] = 08;  // 3番目の数値を8に変更する
+      db.all(query, [hours, minutes], function(err, rows) {
+        if (err) {
+          console.log(err);
+        } else {
+          const sqlDoneMinute = rows[0].min_minute;
+          const sqlDoneHour = rows[0].min_hour;
 
+          const dataString = JSON.stringify({
+            replyToken: req.body.events[0].replyToken,
+            messages: [{
+              type: "text",
+              text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
+            }],
+          });
 
+          const headers = {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + TOKEN,
+          };
 
+          const webhookOptions = {
+            hostname: "api.line.me",
+            path: "/v2/bot/message/reply",
+            method: "POST",
+            headers: headers,
+          };
 
-      
-　　　　　　　　　　　　//ここからメッセージの制御になる
-      //const sqlDone = rows; //お守りです。
-      //ここでsqlとjsを繋げてフロントチームがわかりやすくする。変数名は適当なのでrowsの部分のみ変更
-      const sqlDoneMinute = rows[0]; // rowsの1番目の要素を取得
-      const sqlDoneHour = rows[1];  // rowsの2番目の要素を取得
-     
-      const dataString = JSON.stringify({
-        replyToken: req.body.events[0].replyToken,
-        messages: [{
-          type: "text",
-          text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`//最終的にuser側が見ることができる文章はここ
-        }],
+          const request = https.request(webhookOptions);
+
+          request.on("error", (err) => {
+            console.error(err);
+          });
+
+          request.write(dataString);
+          request.end();
+        }
       });
-
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + TOKEN,
-      };
-
-      const webhookOptions = {
-        hostname: "api.line.me",
-        path: "/v2/bot/message/reply",
-        method: "POST",
-        headers: headers,
-      };
-
-      const request = https.request(webhookOptions);
-
-      request.on("error", (err) => {
-        console.error(err);
-      });
-
-      request.write(dataString);
-      request.end();
-
     } else {
-      console.error("Invalid time format provided by the user.");//hh:mmに合わないテキストが来たらConsoleに文が提示
+      console.error("Invalid time format provided by the user.");
     }
   }
 });
@@ -87,4 +81,3 @@ app.post("/webhook", function (req, res) {
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
-
