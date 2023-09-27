@@ -1,0 +1,39 @@
+-- --TX 北千住駅 つくば方面 つくば行き 快速・区間快速 朝6時～10時
+-- create table TX_kitasenju (id integer PRIMARY KEY NOT NULL, depart_minute integer NOT NULL, depart_hour integer NOT NULL);
+-- --6時
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (01, 06);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (15, 06);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (27, 06);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (37, 06);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (51, 06);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (59, 06);
+-- --7時
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (11, 07);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (17, 07);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (28, 07);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (36, 07);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (47, 07);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (55, 07);
+-- --8時
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (07, 08);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (15, 08);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (25, 08);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (35, 08);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (45, 08);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (58, 08);
+-- --9時
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (12, 09);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (24, 09);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (39, 09);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (54, 09);
+-- --10時
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (11, 10);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (23, 10);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (41, 10);
+-- insert into TX_kitasenju (depart_minute, depart_hour) values (53, 10);
+
+--test 
+select MIN(depart_hour), depart_minute from TX_kitasenju where (depart_hour*100+depart_minute) > 10*100+01;
+--select * from tx_kitasenju;
+
+--shellタブにて、sqlite3 tx_kitasenju.db < main.sql と入力してください
