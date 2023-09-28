@@ -37,16 +37,55 @@ app.post("/webhook", function(req, res) {
       db.all(query, [hours, minutes], function(err, rows) {
         if (err) {
           console.log(err);
-        } else {
-          const sqlDoneMinute = rows[0].min_minute;
-          const sqlDoneHour = rows[0].min_hour;
-
+          return
+        }
+        let masseges;
+        if(rows[0].min_hour == null || rows[0].min_minute == null){
+          masseges =[{
+            type:"text",
+            text:"申し訳ありませんが検索対象時間外ですので、検索できません。\n検索対象時間　6：00〜10：52"
+          }];
           const dataString = JSON.stringify({
             replyToken: req.body.events[0].replyToken,
-            messages: [{
+            messages: masseges,
+              //type: "text",
+              //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
+          });
+
+          const headers = {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + TOKEN,
+          };
+
+          const webhookOptions = {
+            hostname: "api.line.me",
+            path: "/v2/bot/message/reply",
+            method: "POST",
+            headers: headers,
+          };
+
+          const request = https.request(webhookOptions);
+
+          request.on("error", (err) => {
+            console.error(err);
+          });
+
+          request.write(dataString);
+          request.end();
+          
+        }　else {
+          const sqlDoneMinute = rows[0].min_minute;
+          const sqlDoneHour = rows[0].min_hour;
+            masseges =[{
               type: "text",
-              text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
-            }],
+              text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}` 
+            }];
+  
+          const dataString = JSON.stringify({
+            replyToken: req.body.events[0].replyToken,
+            messages: masseges,
+              //type: "text",
+              //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
           });
 
           const headers = {
