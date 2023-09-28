@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.LINE_ACCESS_TOKEN;
 
 // Test関数
-const ROUTE_NAME = "つくばTX";
+const ROUTE_NAME = "つくばエクスプレス";
 
 // ミドルウェアの設定
 app.use(express.json());
@@ -40,16 +40,16 @@ app.post("/webhook", function(req, res) {
           return
         }
         let masseges;
-        if(rows[0].min_hour == null || rows[0].min_minute == null){
-          masseges =[{
-            type:"text",
-            text:"申し訳ありませんが検索対象時間外ですので、検索できません。\n検索対象時間　6：00〜10：52"
+        if (rows[0].min_hour == null || rows[0].min_minute == null) {
+          masseges = [{
+            type: "text",
+            text: "申し訳ありませんが検索対象時間外ですので、検索できません。\n検索対象時間　6：00〜10：52"
           }];
           const dataString = JSON.stringify({
             replyToken: req.body.events[0].replyToken,
             messages: masseges,
-              //type: "text",
-              //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
+            //type: "text",
+            //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
           });
 
           const headers = {
@@ -72,20 +72,20 @@ app.post("/webhook", function(req, res) {
 
           request.write(dataString);
           request.end();
-          
-        }　else {
+
+        } else {
           const sqlDoneMinute = rows[0].min_minute;
           const sqlDoneHour = rows[0].min_hour;
-            masseges =[{
-              type: "text",
-              text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}` 
-            }];
-  
+          masseges = [{
+            type: "text",
+            text: `路線名：${ROUTE_NAME}\n出発地：北千住駅-->つくば駅\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
+          }];
+
           const dataString = JSON.stringify({
             replyToken: req.body.events[0].replyToken,
             messages: masseges,
-              //type: "text",
-              //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
+            //type: "text",
+            //text: `路線名：${ROUTE_NAME}\n出発時刻：${sqlDoneHour}:${sqlDoneMinute}`
           });
 
           const headers = {
